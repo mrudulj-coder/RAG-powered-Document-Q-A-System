@@ -10,7 +10,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # ── LLM Settings ─────────────────────────────────────────────────────
 LLM_MODEL = "gemini-2.0-flash"
-EMBEDDING_MODEL = "models/embedding-001"
+EMBEDDING_MODEL = "models/gemini-embedding-001"
 TEMPERATURE = 0.3
 
 # ── Chunking Settings ────────────────────────────────────────────────
