@@ -1,11 +1,10 @@
-"""RAG query engine using LangChain and Google Gemini."""
+"""RAG query engine using LangChain Expression Language and Google Gemini."""
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains.retrieval import create_retrieval_chain
-from langchain.chains.history_aware_retriever import create_history_aware_retriever
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from rag.vector_store import get_retriever
 from config import GOOGLE_API_KEY, LLM_MODEL, TEMPERATURE
 
@@ -16,8 +15,19 @@ def _get_llm() -> ChatGoogleGenerativeAI:
         model=LLM_MODEL,
         google_api_key=GOOGLE_API_KEY,
         temperature=TEMPERATURE,
-        convert_system_message_to_human=True,
     )
+
+
+def _format_docs(docs):
+    """Format retrieved documents into a single context string."""
+    formatted = []
+    for doc in docs:
+        source = doc.metadata.get("source", "Unknown")
+        page = doc.metadata.get("page", "N/A")
+        formatted.append(
+            f"[Source: {source}, Page: {page}]\n{doc.page_content}"
+        )
+    return "\n\n---\n\n".join(formatted)
 
 
 # ── Prompt: Reformulate question using chat history ──────────────────
@@ -60,7 +70,7 @@ QA_PROMPT = ChatPromptTemplate.from_messages(
 
 def create_rag_chain():
     """
-    Build a conversational RAG chain with history-aware retrieval.
+    Build a conversational RAG chain using LCEL.
 
     The chain:
     1. Reformulates the user question using chat history for context
@@ -70,18 +80,23 @@ def create_rag_chain():
     llm = _get_llm()
     retriever = get_retriever()
 
-    # Step 1: History-aware retriever (reformulates question)
-    history_aware_retriever = create_history_aware_retriever(
-        llm, retriever, CONTEXTUALIZE_PROMPT
+    # Contextualize chain: reformulate question with history
+    contextualize_chain = CONTEXTUALIZE_PROMPT | llm | StrOutputParser()
+
+    def contextualized_question(input_dict):
+        """If there's chat history, reformulate the question."""
+        if input_dict.get("chat_history"):
+            return contextualize_chain.invoke(input_dict)
+        return input_dict["input"]
+
+    # Full RAG chain using LCEL
+    rag_chain = (
+        RunnablePassthrough.assign(
+            context=lambda x: retriever.invoke(contextualized_question(x))
+        )
     )
 
-    # Step 2: QA chain that stuffs docs into prompt
-    qa_chain = create_stuff_documents_chain(llm, QA_PROMPT)
-
-    # Step 3: Full retrieval chain
-    rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
-
-    return rag_chain
+    return rag_chain, llm
 
 
 def query(question: str, chat_history: list) -> dict:
@@ -95,7 +110,7 @@ def query(question: str, chat_history: list) -> dict:
     Returns:
         dict with 'answer' and 'context' (source documents).
     """
-    rag_chain = create_rag_chain()
+    rag_chain, llm = create_rag_chain()
 
     # Convert chat history to LangChain message format
     history_messages = []
@@ -103,11 +118,26 @@ def query(question: str, chat_history: list) -> dict:
         history_messages.append(HumanMessage(content=human_msg))
         history_messages.append(AIMessage(content=ai_msg))
 
+    # Step 1: Get context (retrieved docs)
     result = rag_chain.invoke(
         {"input": question, "chat_history": history_messages}
     )
 
+    context_docs = result["context"]
+
+    # Step 2: Generate answer with context
+    formatted_context = _format_docs(context_docs)
+    qa_messages = QA_PROMPT.invoke(
+        {
+            "context": formatted_context,
+            "chat_history": history_messages,
+            "input": question,
+        }
+    )
+
+    answer = llm.invoke(qa_messages)
+
     return {
-        "answer": result["answer"],
-        "context": result.get("context", []),
+        "answer": answer.content,
+        "context": context_docs,
     }
