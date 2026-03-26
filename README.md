@@ -8,6 +8,8 @@ A production-quality **Retrieval-Augmented Generation (RAG)** system that lets y
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F00?style=for-the-badge)
 ![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 
+![DocuMind AI Screenshot](assets/screenshot.png)
+
 ---
 
 ## ✨ Features
@@ -120,7 +122,7 @@ All settings are centralized in `config.py`:
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `LLM_MODEL` | `gemini-2.0-flash` | Gemini model for answer generation |
-| `EMBEDDING_MODEL` | `models/embedding-001` | Gemini model for embeddings |
+| `EMBEDDING_MODEL` | `models/gemini-embedding-001` | Gemini model for embeddings |
 | `CHUNK_SIZE` | `1000` | Characters per text chunk |
 | `CHUNK_OVERLAP` | `200` | Overlap between chunks |
 | `TOP_K` | `5` | Number of chunks retrieved per query |
