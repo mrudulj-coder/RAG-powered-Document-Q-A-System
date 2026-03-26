@@ -1,5 +1,7 @@
 """RAG query engine using LangChain Expression Language and Google Gemini."""
 
+import time
+import logging
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
@@ -7,6 +9,12 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from rag.vector_store import get_retriever
 from config import GOOGLE_API_KEY, LLM_MODEL, TEMPERATURE
+
+logger = logging.getLogger(__name__)
+
+# ── Retry Settings ───────────────────────────────────────────────────
+MAX_RETRIES = 3
+INITIAL_RETRY_DELAY = 10  # seconds
 
 
 def _get_llm() -> ChatGoogleGenerativeAI:
@@ -16,6 +24,31 @@ def _get_llm() -> ChatGoogleGenerativeAI:
         google_api_key=GOOGLE_API_KEY,
         temperature=TEMPERATURE,
     )
+
+
+def _invoke_with_retry(llm, messages, max_retries=MAX_RETRIES):
+    """Invoke LLM with automatic retry on rate limit errors."""
+    for attempt in range(max_retries):
+        try:
+            return llm.invoke(messages)
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                delay = INITIAL_RETRY_DELAY * (2 ** attempt)
+                logger.warning(
+                    f"Rate limited (attempt {attempt + 1}/{max_retries}). "
+                    f"Retrying in {delay}s..."
+                )
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                else:
+                    raise RuntimeError(
+                        f"⏳ Gemini API rate limit exceeded after {max_retries} "
+                        f"retries. Please wait 1-2 minutes and try again. "
+                        f"Consider upgrading from the free tier for higher limits."
+                    ) from e
+            else:
+                raise
 
 
 def _format_docs(docs):
@@ -135,7 +168,7 @@ def query(question: str, chat_history: list) -> dict:
         }
     )
 
-    answer = llm.invoke(qa_messages)
+    answer = _invoke_with_retry(llm, qa_messages)
 
     return {
         "answer": answer.content,
