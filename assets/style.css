@@ -1,0 +1,243 @@
+/* ── RAG Document Q&A – Premium Dark Theme ───────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Root Variables ───────────────────────────────────────── */
+:root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: rgba(255, 255, 255, 0.04);
+    --bg-glass: rgba(255, 255, 255, 0.06);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --text-primary: #e8e8ed;
+    --text-secondary: #8b8b9e;
+    --text-muted: #5a5a6e;
+    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --accent-blue: #667eea;
+    --accent-purple: #764ba2;
+    --accent-emerald: #34d399;
+    --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+}
+
+/* ── Global Styles ────────────────────────────────────────── */
+.stApp {
+    background-color: var(--bg-primary) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    color: var(--text-primary) !important;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0d0d15 0%, #121220 100%) !important;
+    border-right: 1px solid var(--border-glass) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown h1,
+section[data-testid="stSidebar"] .stMarkdown h2,
+section[data-testid="stSidebar"] .stMarkdown h3 {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown p,
+section[data-testid="stSidebar"] .stMarkdown li {
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem !important;
+}
+
+/* ── File Uploader ────────────────────────────────────────── */
+section[data-testid="stFileUploader"] {
+    border: 2px dashed rgba(102, 126, 234, 0.3) !important;
+    border-radius: var(--radius-lg) !important;
+    background: rgba(102, 126, 234, 0.04) !important;
+    transition: all 0.3s ease !important;
+}
+
+section[data-testid="stFileUploader"]:hover {
+    border-color: rgba(102, 126, 234, 0.6) !important;
+    background: rgba(102, 126, 234, 0.08) !important;
+    box-shadow: var(--shadow-glow) !important;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.stButton > button {
+    background: var(--accent-gradient) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.6rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: 0.02em !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+}
+
+.stButton > button:active {
+    transform: translateY(0) !important;
+}
+
+/* ── Chat Messages ────────────────────────────────────────── */
+.stChatMessage {
+    background: var(--bg-glass) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.2rem !important;
+    margin-bottom: 1rem !important;
+    animation: slideIn 0.3s ease-out !important;
+}
+
+/* User messages - subtle accent */
+.stChatMessage[data-testid="stChatMessageUser"] {
+    background: rgba(102, 126, 234, 0.08) !important;
+    border-color: rgba(102, 126, 234, 0.15) !important;
+}
+
+/* ── Chat Input ───────────────────────────────────────────── */
+.stChatInput {
+    border-color: var(--border-glass) !important;
+}
+
+.stChatInput > div {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: var(--radius-lg) !important;
+    transition: border-color 0.3s ease !important;
+}
+
+.stChatInput > div:focus-within {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.15) !important;
+}
+
+.stChatInput textarea {
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* ── Expander (Source Citations) ───────────────────────────── */
+.streamlit-expanderHeader {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.streamlit-expanderHeader:hover {
+    background: var(--bg-glass) !important;
+    color: var(--text-primary) !important;
+}
+
+.streamlit-expanderContent {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-top: none !important;
+    border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+}
+
+/* ── Success/Info/Warning Alerts ──────────────────────────── */
+.stAlert {
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.stSpinner > div {
+    border-top-color: var(--accent-blue) !important;
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+hr {
+    border-color: var(--border-glass) !important;
+    opacity: 0.5 !important;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── Metric Cards ─────────────────────────────────────────── */
+div[data-testid="stMetric"] {
+    background: var(--bg-glass) !important;
+    border: 1px solid var(--border-glass) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 1rem !important;
+}
+
+div[data-testid="stMetric"] label {
+    color: var(--text-secondary) !important;
+}
+
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    color: var(--accent-blue) !important;
+    font-weight: 700 !important;
+}
+
+/* ── Document Card Styling ────────────────────────────────── */
+.document-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.document-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(102, 126, 234, 0.3);
+}
